@@ -30,13 +30,10 @@ class nodejs(
 
     'Ubuntu': {
       include 'apt'
-
-      # Only use PPA when necessary.
-      if $::lsbdistcodename != 'Precise'{
-        apt::ppa { 'ppa:chris-lea/node.js':
-          before => Anchor['nodejs::repo'],
-        }
+      apt::ppa { 'ppa:chris-lea/node.js':
+        before => Anchor['nodejs::repo'],
       }
+
     }
 
     'Fedora', 'RedHat', 'CentOS', 'OEL', 'OracleLinux', 'Amazon': {
@@ -69,10 +66,12 @@ class nodejs(
     require => Anchor['nodejs::repo']
   }
 
-  package { 'npm':
-    name    => $nodejs::params::npm_pkg,
-    ensure  => present,
-    require => Anchor['nodejs::repo']
+  if $::lsbdistcodename != 'precise'{
+    package { 'npm':
+      name    => $nodejs::params::npm_pkg,
+      ensure  => present,
+      require => Anchor['nodejs::repo']
+    }
   }
 
   if $proxy {
